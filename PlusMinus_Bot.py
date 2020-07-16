@@ -70,7 +70,6 @@ async def event_message(ctx):
         # not enough votes?
         if len(votes) < 10:
             print('Nicht genug votes: {}'.format(len(votes)))
-            votes.clear()
         else:
             get_votes()
             output = 'Endergebnis nach 5 Sekunden ohne Vote: ' \
