@@ -1,15 +1,16 @@
 import os
-from twitchio.ext import commands
 import configparser
-from sys import platform
+import sys
+from twitchio.ext import commands
 
 # Check platform
-if platform == "linux" or platform == "linux2":
+if sys.platform == "linux" or sys.platform == "linux2":
     configfile = '/config.ini'
-elif platform == "darwin":
+elif sys.platform == "win32":
     configfile = '\\config.ini'
-elif platform == "win32":
-    configfile = '\\config.ini'
+else:
+    print('Platform unsupported: {}'.format(sys.platform))
+    sys.exit()
 
 # get current folder
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -39,16 +40,10 @@ async def event_ready():
                                                              config['Default']['CHANNEL']))
 
 
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        return
-    print(ctx.content)
-    raise error
-
 
 @bot.command(name='plusminus')
 async def plusminus(ctx):
+    """command !plusminus for a special voting method"""
     if ctx.message.tags['mod'] == 1:
         pass
     elif ctx.author.name.lower() == 'derhauge':
@@ -82,16 +77,17 @@ async def plusminus(ctx):
     if (neutral + plus + minus) == 0:
         await ctx.send('Keine gültigen Votes in den letzten {} Nachrichten gefunden.'.format(len(messages[0])))
     else:
-        bar = '||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||'
-        scale = 3
-        plus_len = int(round((plus / (neutral + plus + minus) * 100) / scale, 0))
-        neutral_len = int(round((neutral / (neutral + plus + minus) * 100) / scale, 0))
-        minus_len = int(round((minus / (neutral + plus + minus) * 100) / scale, 0))
-
+        # Nightbot does not like visualizations:
+        # bar = '||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||'
+        # scale = 3
+        # plus_len = int(round((plus / (neutral + plus + minus) * 100) / scale, 0))
+        # neutral_len = int(round((neutral / (neutral + plus + minus) * 100) / scale, 0))
+        # minus_len = int(round((minus / (neutral + plus + minus) * 100) / scale, 0))
         # output = 'Ergebnis der letzten {} MSGs: ' \
         #         'Plus: {} --- Neutral: {} --- Minus: {} ' \
         #         '+|{}|_|{}|_|{}|-'.format(
         #            len(messages[0]), plus, neutral, minus, bar[:plus_len], bar[:neutral_len], bar[:minus_len])
+        
         output = 'Ergebnis der letzten {} MSGs: ' \
                  'Plus: {} --- Neutral: {} --- Minus: {} '.format(
                      len(messages[0]), plus, neutral, minus)
