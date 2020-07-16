@@ -68,8 +68,9 @@ async def event_message(ctx):
     # have X seconds passed since last vote? -> post end result
     if time.time() >= vote_last + 5 and vote_first != 0:
         # not enough votes?
-        if len(votes) < 5:
+        if len(votes) < 10:
             print('Nicht genug votes: {}'.format(len(votes)))
+            votes.clear()
         else:
             get_votes()
             output = 'Endergebnis nach 5 Sekunden ohne Vote: ' \
@@ -85,7 +86,7 @@ async def event_message(ctx):
     # have X seconds passed since first vote? -> post interim result
     if time.time() >= vote_first + 20 and vote_first != 0:
         # not enough votes?
-        if len(votes) < 5:
+        if len(votes) < 10:
             print('Nicht genug votes: {}'.format(len(votes)))
             vote_first = 0
             vote_last = 0
