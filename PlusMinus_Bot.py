@@ -83,14 +83,21 @@ async def event_message(ctx):
         votes.clear()
 
     # have X seconds passed since first vote? -> post interim result
-    if time.time() >= vote_first + 10 and vote_first != 0:
-        vote_first = time.time()
-        get_votes()
-        output = 'Zwischenergebnis: ' \
-                 'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
-                     plus, neutral, minus)
-        await ctx.channel.send(output)
-        print(output)
+    if time.time() >= vote_first + 20 and vote_first != 0:
+        # not enough votes?
+        if len(votes) < 5:
+            print('Nicht genug votes: {}'.format(len(votes)))
+            vote_first = 0
+            vote_last = 0
+            votes.clear()
+        else:
+            vote_first = time.time()
+            get_votes()
+            output = 'Zwischenergebnis: ' \
+                     'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
+                         plus, neutral, minus)
+            await ctx.channel.send(output)
+            print(output)
 
 
 def vote(ctx, votetype):
