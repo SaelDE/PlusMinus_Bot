@@ -2,7 +2,7 @@
 
 Twitch Chat-Bot with 1 custom command for a special voting method.
 
-!plusminus
+## !plusminus
 
 Checks the last 150 messages for:
 
