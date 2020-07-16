@@ -100,7 +100,7 @@ async def event_message(ctx):
             await ctx.channel.send(output)
             print(output)
 
-
+            
 def vote(ctx, votetype):
     global votes, vote_first, vote_last
 
@@ -111,9 +111,14 @@ def vote(ctx, votetype):
     # set time of last vote
     vote_last = time.time()
 
+    # new vote or changed vote?
+    if ctx.author.name in votes:
+        print('Vote changed: {} - {} -> {}'.format(ctx.author.name, votes[ctx.author.name], votetype))
+    else:
+        print('Vote added: {} - {}'.format(ctx.author.name, votetype))
+
     # add vote to dict
     votes[ctx.author.name] = votetype
-    print('Vote Added: {} - {}'.format(ctx.author.name, votetype))
 
 
 def get_votes():
