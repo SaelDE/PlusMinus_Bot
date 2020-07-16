@@ -2,7 +2,7 @@
 
 Twitch Chat-Bot that monitors chat for a special voting method.
 
-## Montoring
+## Monitoring
 
 Checks every chat message for the following beginnings:
 
