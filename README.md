@@ -3,6 +3,7 @@
 Twitch Chat-Bot with 1 custom command for a special voting method.
 
 !plusminus
+
 Checks the last 150 messages for:
 
 \+\- \/ \-\+ \/ haugeNeutral \-\> Neutral
