@@ -1,6 +1,7 @@
 import os
 import configparser
 import sys
+import time
 from twitchio.ext import commands
 
 # Check platform
@@ -19,9 +20,13 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 config = configparser.ConfigParser()
 config.read(dir_path + configfile)
 
-# declare messages list
-messages = [], []
-
+# declare vars
+plus = 0
+minus = 0
+neutral = 0
+vote_first = 0
+vote_last = 0
+votes = {}
 
 bot = commands.Bot(
     # set up the bot
@@ -40,83 +45,98 @@ async def event_ready():
                                                              config['Default']['CHANNEL']))
 
 
-
-@bot.command(name='plusminus')
-async def plusminus(ctx):
-    """command !plusminus for a special voting method"""
-    if ctx.message.tags['mod'] == 1:
-        pass
-    elif ctx.author.name.lower() == 'derhauge':
-        pass
-    elif ctx.author.name.lower() == 'sael_de':
-        pass
-    else:
-        print('Invalid User: {}'.format(ctx.author.name))
-        return
-
-    plus = 0
-    minus = 0
-    neutral = 0
-    voters = []
-
-    for i in range(len(messages[0])):
-        msg = messages[0][i]
-        user = messages[1][i]
-
-        if user not in voters:
-            if msg[:2] == ['+-'] or msg[:2] == ['-+'] or msg[:9] == ['haugeNeut']:
-                neutral += 1
-                voters.append(user)
-            elif msg[:1] == ['+'] or msg[:9] == ['haugePlus']:
-                plus += 1
-                voters.append(user)
-            elif msg[:1] == ['-'] or msg[:9] == ['haugeMinu']:
-                minus += 1
-                voters.append(user)
-
-    if (neutral + plus + minus) == 0:
-        await ctx.send('Keine gültigen Votes in den letzten {} Nachrichten gefunden.'.format(len(messages[0])))
-    else:
-        # Nightbot does not like visualizations:
-        # bar = '||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||'
-        # scale = 3
-        # plus_len = int(round((plus / (neutral + plus + minus) * 100) / scale, 0))
-        # neutral_len = int(round((neutral / (neutral + plus + minus) * 100) / scale, 0))
-        # minus_len = int(round((minus / (neutral + plus + minus) * 100) / scale, 0))
-        # output = 'Ergebnis der letzten {} MSGs: ' \
-        #         'Plus: {} --- Neutral: {} --- Minus: {} ' \
-        #         '+|{}|_|{}|_|{}|-'.format(
-        #            len(messages[0]), plus, neutral, minus, bar[:plus_len], bar[:neutral_len], bar[:minus_len])
-        
-        output = 'Ergebnis der letzten {} MSGs: ' \
-                 'Plus: {} --- Neutral: {} --- Minus: {} '.format(
-                     len(messages[0]), plus, neutral, minus)
-        await ctx.send(output)
-        print(output)
-
-
 @bot.event
 async def event_message(ctx):
     """Runs every time a message is sent in chat."""
+    global votes, vote_first, vote_last
 
     # make sure the bot ignores itself and nightbot
-    if ctx.author.name.lower() == config['Default']['BOT_NICK'].lower():
-        return
+    # if ctx.author.name.lower() == config['Default']['BOT_NICK'].lower():
+    #    return
     if ctx.author.name.lower() == 'nightbot':
         return
 
-    # log every message
-    # print('{}: {}'.format(ctx.author.name, ctx.content))
-    messages[0].append([ctx.content])
-    messages[1].append([ctx.author.name])
+    # check if message is a vote
+    msg = ctx.content
+    if msg[:2] == '+-' or msg[:2] == '-+' or msg[:9] == 'haugeNeut':
+        vote(ctx, 'neutral')
+    elif msg[:1] == '+' or msg[:9] == 'haugePlus':
+        vote(ctx, 'plus')
+    elif msg[:1] == '-' or msg[:9] == 'haugeMinu':
+        vote(ctx, 'minus')
 
-    # remove the last message over 150
-    if len(messages[0]) > 150:
-        messages[0].pop(0)
-        messages[1].pop(0)
+    # have X seconds passed since last vote? -> post end result
+    if time.time() >= vote_last + 5 and vote_first != 0:
+        # not enough votes?
+        if len(votes) < 10:
+            print('Nicht genug votes: {}'.format(len(votes)))
+        else:
+            get_votes()
+            output = 'Endergebnis nach 5 Sekunden ohne Vote: ' \
+                     'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
+                         plus, neutral, minus)
+            await ctx.channel.send(output)
+            print(output)
 
-    # hook for commands
-    await bot.handle_commands(ctx)
+        vote_first = 0
+        vote_last = 0
+        votes.clear()
+
+    # have X seconds passed since first vote? -> post interim result
+    if time.time() >= vote_first + 20 and vote_first != 0:
+        # not enough votes?
+        if len(votes) < 10:
+            print('Nicht genug votes: {}'.format(len(votes)))
+            vote_first = 0
+            vote_last = 0
+            votes.clear()
+        else:
+            vote_first = time.time()
+            get_votes()
+            output = 'Zwischenergebnis: ' \
+                     'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
+                         plus, neutral, minus)
+            await ctx.channel.send(output)
+            print(output)
+
+            
+def vote(ctx, votetype):
+    global votes, vote_first, vote_last
+
+    # is this the first vote?
+    if vote_first == 0:
+        vote_first = time.time()
+
+    # set time of last vote
+    vote_last = time.time()
+
+    # new vote or changed vote?
+    if ctx.author.name in votes:
+        print('Vote changed: {} - {} -> {}'.format(ctx.author.name, votes[ctx.author.name], votetype))
+    else:
+        print('Vote added: {} - {}'.format(ctx.author.name, votetype))
+
+    # add vote to dict
+    votes[ctx.author.name] = votetype
+
+
+def get_votes():
+    global plus, minus, neutral
+
+    # reset global vars
+    plus = 0
+    minus = 0
+    neutral = 0
+
+    # count values in dict
+    for x in votes.values():
+        if x == 'neutral':
+            neutral += 1
+        elif x == 'plus':
+            plus += 1
+        elif x == 'minus':
+            minus += 1
+
 
 if __name__ == "__main__":
     bot.run()

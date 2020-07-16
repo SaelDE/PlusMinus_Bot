@@ -1,15 +1,19 @@
 # PlusMinus_Bot
 
-Twitch Chat-Bot with 1 custom command for a special voting method.
+Twitch Chat-Bot that monitors chat for a special voting method.
 
-## !plusminus
+## Monitoring
 
-Checks the last 150 messages for:
+Checks every chat message for the following beginnings:
 
-\+\- \/ \-\+ \/ haugeNeutral \-\> Neutral
+\+\- \/ \-\+ \/ haugeNeut \-\> Neutral
 
 \+ \/ haugePlus -> Plus
 
-\- \/ haugeMinus -> Minus
+\- \/ haugeMinu -> Minus
 
-Output -> 'Ergebnis der letzten X MSGs: Plus: X --- Neutral: X --- Minus: X'
+Posts an interim result every 20 seconds and an end result after 5 seconds of no additional votes.
+
+Checks if more than 10 votes have been added before posting any result.
+
+
