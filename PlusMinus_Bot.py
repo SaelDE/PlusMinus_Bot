@@ -80,6 +80,7 @@ async def event_message(ctx):
 
         vote_first = 0
         vote_last = 0
+        votes.clear()
 
     # have X seconds passed since first vote? -> post interim result
     if time.time() >= vote_first + 10 and vote_first != 0:
