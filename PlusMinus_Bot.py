@@ -110,6 +110,7 @@ async def event_message(ctx):
 
 
 def vote(ctx, votetype):
+    """adds votes to the votes-dict and sets timestamps"""
     global votes, vote_first, vote_last, spammer
 
     # is this the first vote?
@@ -137,6 +138,7 @@ def vote(ctx, votetype):
 
 
 def get_votes():
+    """analyzes the votes-dict and counts the votes"""
     global plus, minus, neutral
 
     # reset global vars
