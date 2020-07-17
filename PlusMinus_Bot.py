@@ -70,7 +70,7 @@ async def event_message(ctx):
     if time.time() >= vote_last + int(config['Vote']['DELAY_END']) and vote_first != 0:
         # not enough votes?
         if len(votes) < int(config['Vote']['VOTES_MIN']):
-            print('Nicht genug votes: {}'.format(len(votes)))
+            print('Not enough votes: {}'.format(len(votes)))
         else:
             get_votes()
             output = 'Plus: {} + Neutral: {} - Minus: {} ' \
