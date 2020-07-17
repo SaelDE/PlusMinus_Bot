@@ -20,7 +20,18 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 config = configparser.ConfigParser()
 config.read(dir_path + configfile)
 
-# declare vars
+# check delays to prevent excessive spamming or prematurely ending votes
+if int(config['Vote']['DELAY_END']) < 5:
+    config['Vote']['DELAY_END'] = '5'
+    print('DELAY_END too low. Setting DELAY_END to 5 seconds')
+if int(config['Vote']['DELAY_INTERIM']) < 15:
+    config['Vote']['DELAY_INTERIM'] = '15'
+    print('DELAY_INTERIM too low. Setting DELAY_INTERIM to 15 seconds')
+if int(config['Vote']['DELAY_END']) > int(config['Vote']['DELAY_INTERIM']):
+    config['Vote']['DELAY_END'] = config['Vote']['DELAY_INTERIM']
+    print('DELAY_END too high. Setting DELAY_END to {}'.format(config['Vote']['DELAY_INTERIM']))
+
+# declare global vars
 plus = 0
 minus = 0
 neutral = 0
