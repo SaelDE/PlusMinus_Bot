@@ -66,40 +66,40 @@ async def event_message(ctx):
         vote(ctx, 'minus')
 
     # have X seconds passed since last vote? -> post end result
-    if time.time() >= vote_last + 5 and vote_first != 0:
+    if time.time() >= vote_last + int(config['Vote']['DELAY_END']) and vote_first != 0:
         # not enough votes?
-        if len(votes) < 10:
+        if len(votes) < int(config['Vote']['VOTES_MIN']):
             print('Nicht genug votes: {}'.format(len(votes)))
         else:
             get_votes()
-            output = 'Endergebnis nach 5 Sekunden ohne Vote: ' \
+            output = 'Endergebnis___________: ' \
                      'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
                          plus, neutral, minus)
             await ctx.channel.send(output)
-            print(output)
+            print('Sending: {}'.format(output))
 
         vote_first = 0
         vote_last = 0
         votes.clear()
 
     # have X seconds passed since first vote? -> post interim result
-    if time.time() >= vote_first + 20 and vote_first != 0:
+    if time.time() >= vote_first + int(config['Vote']['DELAY_INTERIM']) and vote_first != 0:
         # not enough votes?
-        if len(votes) < 10:
-            print('Nicht genug votes: {}'.format(len(votes)))
+        if len(votes) < int(config['Vote']['VOTES_MIN']):
+            print('Not enough votes: {}'.format(len(votes)))
             vote_first = 0
             vote_last = 0
             votes.clear()
         else:
             vote_first = time.time()
             get_votes()
-            output = 'Zwischenergebnis: ' \
+            output = 'Zwischenergebnis_______: ' \
                      'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
                          plus, neutral, minus)
             await ctx.channel.send(output)
-            print(output)
+            print('Sending: {}'.format(output))
 
-            
+
 def vote(ctx, votetype):
     global votes, vote_first, vote_last
 
