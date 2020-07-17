@@ -2,6 +2,7 @@ import os
 import configparser
 import sys
 import time
+import operator
 from twitchio.ext import commands
 
 # Check platform
@@ -27,6 +28,7 @@ neutral = 0
 vote_first = 0
 vote_last = 0
 votes = {}
+spammer = {}
 
 bot = commands.Bot(
     # set up the bot
@@ -48,7 +50,7 @@ async def event_ready():
 @bot.event
 async def event_message(ctx):
     """Runs every time a message is sent in chat."""
-    global votes, vote_first, vote_last
+    global votes, vote_first, vote_last, spammer
 
     # make sure the bot ignores itself and nightbot
     # if ctx.author.name.lower() == config['Default']['BOT_NICK'].lower():
@@ -72,15 +74,21 @@ async def event_message(ctx):
             print('Nicht genug votes: {}'.format(len(votes)))
         else:
             get_votes()
-            output = 'Endergebnis___________: ' \
-                     'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
-                         plus, neutral, minus)
+            output = 'Plus: {} + Neutral: {} - Minus: {} ' \
+                     'Endergebnis nach 5 Sekunden ohne neuen Vote. '.format(plus,
+                                                                            neutral,
+                                                                            minus)
+            # spammer_top = max(spammer, key=spammer.get)
+            # if spammer[spammer_top] >= 10:
+            #     output = output + '@{} ({}) hör auf zu spammen!'.format(spammer_top,
+            #                                                        spammer[spammer_top])
             await ctx.channel.send(output)
             print('Sending: {}'.format(output))
 
         vote_first = 0
         vote_last = 0
         votes.clear()
+        spammer.clear()
 
     # have X seconds passed since first vote? -> post interim result
     if time.time() >= vote_first + int(config['Vote']['DELAY_INTERIM']) and vote_first != 0:
@@ -90,18 +98,20 @@ async def event_message(ctx):
             vote_first = 0
             vote_last = 0
             votes.clear()
+            spammer.clear()
         else:
             vote_first = time.time()
             get_votes()
-            output = 'Zwischenergebnis_______: ' \
-                     'Plus: {} +++ Neutral: {} --- Minus: {} '.format(
-                         plus, neutral, minus)
+            output = 'Plus: {} + Neutral: {} - Minus: {} ' \
+                     'Zwischenergebnis nach 20 Sekunden durchgänge Votes. '.format(plus,
+                                                                                   neutral,
+                                                                                   minus)
             await ctx.channel.send(output)
             print('Sending: {}'.format(output))
 
 
 def vote(ctx, votetype):
-    global votes, vote_first, vote_last
+    global votes, vote_first, vote_last, spammer
 
     # is this the first vote?
     if vote_first == 0:
@@ -110,9 +120,16 @@ def vote(ctx, votetype):
     # set time of last vote
     vote_last = time.time()
 
-    # new vote or changed vote?
+    # new, changed or spam?
     if ctx.author.name in votes:
-        print('Vote changed: {} - {} -> {}'.format(ctx.author.name, votes[ctx.author.name], votetype))
+        if votes[ctx.author.name] == votetype:
+            print('Vote spam: {} - {} -> {}'.format(ctx.author.name, votes[ctx.author.name], votetype))
+            if ctx.author.name in spammer:
+                spammer[ctx.author.name] = spammer[ctx.author.name] + 1
+            else:
+                spammer[ctx.author.name] = 1
+        else:
+            print('Vote changed: {} - {} -> {}'.format(ctx.author.name, votes[ctx.author.name], votetype))
     else:
         print('Vote added: {} - {}'.format(ctx.author.name, votetype))
 
