@@ -52,8 +52,8 @@ async def event_message(ctx):
     global votes, vote_first, vote_last, spammer
 
     # make sure the bot ignores itself and nightbot
-    # if ctx.author.name.lower() == config['Default']['BOT_NICK'].lower():
-    #    return
+    if ctx.author.name.lower() == config['Default']['BOT_NICK'].lower():
+        return
     if ctx.author.name.lower() == 'nightbot':
         return
 
