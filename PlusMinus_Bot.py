@@ -113,9 +113,9 @@ async def event_message(ctx):
             vote_first = time.time()
             get_votes()
             output = 'Plus: {} + Neutral: {} - Minus: {} ' \
-                     'Zwischenergebnis nach 20 Sekunden durchgänge Votes. '.format(plus,
-                                                                                   neutral,
-                                                                                   minus)
+                     'Zwischenergebnis nach 20 Sekunden durchgängige Votes. '.format(plus,
+                                                                                     neutral,
+                                                                                     minus)
             await ctx.channel.send(output)
             print('Sending: {}'.format(output))
 
