@@ -84,7 +84,7 @@ async def event_message(ctx):
             print('Not enough votes: {}'.format(len(votes)))
         else:
             get_votes()
-            output = 'Plus: {} + Neutral: {} - Minus: {} ' \
+            output = '/me Plus: {} + Neutral: {} - Minus: {} ' \
                      'Endergebnis nach 5 Sekunden ohne neuen Vote. '.format(plus,
                                                                             neutral,
                                                                             minus)
@@ -112,7 +112,7 @@ async def event_message(ctx):
         else:
             vote_first = time.time()
             get_votes()
-            output = 'Plus: {} + Neutral: {} - Minus: {} ' \
+            output = '/me Plus: {} + Neutral: {} - Minus: {} ' \
                      'Zwischenergebnis nach 20 Sekunden durchgängige Votes. '.format(plus,
                                                                                      neutral,
                                                                                      minus)
