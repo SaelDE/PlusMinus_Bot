@@ -85,9 +85,10 @@ async def event_message(ctx):
         else:
             get_votes()
             output = '/me Plus: {} + Neutral: {} - Minus: {} ' \
-                     'Endergebnis nach 5 Sekunden ohne neuen Vote. '.format(plus,
-                                                                            neutral,
-                                                                            minus)
+                     'Endergebnis nach {} Sekunden ohne neuen Vote. '.format(plus,
+                                                                             neutral,
+                                                                             minus,
+                                                                             config['Vote']['DELAY_END'])
             # spammer_top = max(spammer, key=spammer.get)
             # if spammer[spammer_top] >= 10:
             #     output = output + '@{} ({}) hör auf zu spammen!'.format(spammer_top,
@@ -113,9 +114,10 @@ async def event_message(ctx):
             vote_first = time.time()
             get_votes()
             output = '/me Plus: {} + Neutral: {} - Minus: {} ' \
-                     'Zwischenergebnis nach 20 Sekunden durchgängige Votes. '.format(plus,
+                     'Zwischenergebnis nach {} Sekunden durchgängige Votes. '.format(plus,
                                                                                      neutral,
-                                                                                     minus)
+                                                                                     minus,
+                                                                                     config['Vote']['DELAY_INTERIM'])
             await ctx.channel.send(output)
             print('Sending: {}'.format(output))
 
