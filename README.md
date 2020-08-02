@@ -1,6 +1,7 @@
 # PlusMinus_Bot
 
 Discontinued
+
 Integrated into: https://github.com/dnns01/TwitchHausGeist
 
 ## Description
