@@ -84,11 +84,16 @@ async def event_message(ctx):
             print('Not enough votes: {}'.format(len(votes)))
         else:
             get_votes()
-            output = '/me Plus: {} + Neutral: {} - Minus: {} ' \
-                     'Endergebnis nach {} Sekunden ohne neuen Vote. '.format(plus,
-                                                                             neutral,
-                                                                             minus,
-                                                                             config['Vote']['DELAY_END'])
+            output = '/me Plus: {} ({}%) + Neutral: {} ({}%) - Minus: {} ({}%) ' \
+                     'Endergebnis nach {} Sekunden ohne neuen Vote.' \
+                     ' '.format(plus,
+                                int(plus / len(votes) * 100),
+                                neutral,
+                                int(neutral / len(votes) * 100),
+                                minus,
+                                100-int(plus / len(votes) * 100)-int(neutral / len(votes) * 100),
+                                config['Vote']['DELAY_END'])
+
             # spammer_top = max(spammer, key=spammer.get)
             # if spammer[spammer_top] >= 10:
             #     output = output + '@{} ({}) hör auf zu spammen!'.format(spammer_top,
@@ -113,11 +118,16 @@ async def event_message(ctx):
         else:
             vote_first = time.time()
             get_votes()
-            output = '/me Plus: {} + Neutral: {} - Minus: {} ' \
-                     'Zwischenergebnis nach {} Sekunden durchgängige Votes. '.format(plus,
-                                                                                     neutral,
-                                                                                     minus,
-                                                                                     config['Vote']['DELAY_INTERIM'])
+            output = '/me Plus: {} ({}%) + Neutral: {} ({}%) - Minus: {} ({}%) ' \
+                     'Zwischenergebnis nach {} Sekunden durchgängige Votes.' \
+                     ' '.format(plus,
+                                int(plus / len(votes) * 100),
+                                neutral,
+                                int(neutral / len(votes) * 100),
+                                minus,
+                                100-int(plus / len(votes) * 100)-int(neutral / len(votes) * 100),
+                                config['Vote']['DELAY_INTERIM'])
+
             await ctx.channel.send(output)
             print('Sending: {}'.format(output))
 
