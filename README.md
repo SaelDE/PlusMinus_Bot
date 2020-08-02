@@ -1,5 +1,10 @@
 # PlusMinus_Bot
 
+Discontinued
+Integrated into: https://github.com/dnns01/TwitchHausGeist
+
+## Description
+
 Twitch Chat-Bot that monitors chat for a special voting method.
 
 ## Monitoring
